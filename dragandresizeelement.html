@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<style>
+			.box{
+				position: absolute;
+				top: 50px;
+				left: 50px;
+				width: 100px;
+				height: 100px;
+				background-color: red;
+				cursor: move;
+			}
+			.closed{
+				float: right;
+			}
+			.resize{
+				position: absolute;
+				bottom: 0px;
+				right: 0px;
+			}
+		</style>
+	</head>
+	<body>
+		<button class="btn" id="add" onclick="addBox()">add</button>
+	</body>
+	<script language="JavaScript">
+		
+		//得到颜色值
+		function getRandomColor(){
+			var l = "123456789ABCDEF";
+			var colorVaule = "#";
+			for(var i=0; i<6; i++){
+				colorVaule += l[Math.ceil(Math.random()*16)];
+			}
+			return colorVaule;
+		}
+		
+		
+		function dragElement(tId, flag){
+			var draw = document.getElementById(tId);
+			draw.onmousedown = function(e){
+				var e = e || window.event;
+				var diffx = e.clientX - draw.offsetLeft;
+				var diffy = e.clientY - draw.offsetTop;
+				
+//				
+//				if( typeof draw.setCapture()){
+//					draw.setCapture();
+//				}
+				
+				document.onmousemove = function(e){
+					var e = e || window.event;
+					var left = e.clientX - diffx;
+					var top = e.clientY - diffy;
+					
+					
+					if(flag){
+						draw.style.width = e.clientX - draw.offsetLeft + "px";
+						draw.style.height = e.clientY - draw.offsetTop + "px";
+					}else{
+						if(left < 0){
+							left = 0;
+						}else if(left > window.innerWidth - draw.offsetWidth){
+							left = window.innerWidth - draw.offsetWidth;
+						}
+						
+						if(top < 0){
+							top = 0;
+						}else if(top > window.innerHeight - draw.offsetHeight){
+							top = window,innerHeight - draw.offsetHeight;
+						}
+						
+						draw.style.left = left + 'px';
+						draw.style.top = top + 'px';
+					}
+				};
+				
+				document.onmouseup = function(e){
+					this.onmousemove = null;
+					this.onmouseup = null;
+					
+//					if(typeof draw.releaseCapture() != 'undefined'){
+//						draw.releaseCapture();
+//					}
+				}
+			}
+		}
+		
+		function addBox(){
+			var color = getRandomColor();
+			var d = document.createElement("div");
+			var tId = Date.now();
+			d.setAttribute("class","box");
+			d.setAttribute("id", tId);
+			d.style.backgroundColor = color;
+			
+			var close = document.createElement("button");
+			close.setAttribute("class","closed");
+			var closeText = document.createTextNode("x")
+			close.appendChild(closeText);
+			d.appendChild(close);
+			
+			var resize = document.createElement("span");
+			resize.setAttribute("class", "resize");
+			var resizeText = document.createTextNode("__|");
+			resize.appendChild(resizeText);
+			d.appendChild(resize);
+			
+			document.body.appendChild(d);
+			
+			close.onclick = function(){
+				document.body.removeChild(document.getElementById(tId));
+			}
+			
+			resize.onmouseenter = function(){
+				d.style.cursor = "se-resize";
+				dragElement(tId, true);
+			}
+			
+			resize.onmouseleave = function(){
+				d.style.cursor = "move";
+				dragElement(tId, false);
+			}
+			
+			dragElement(tId, false);
+		}
+		
+		
+		
+	</script>
+</html>
